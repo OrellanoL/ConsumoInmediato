@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartelería Consumo Inmediato - Carrefour</title>
+    <!-- Librería jsPDF para descarga directa de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Estilos renovados para el encabezado / título */
+        .header-app {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f5;
+            padding-bottom: 15px;
+        }
+        .header-app h1 {
+            color: #4b1e6d;
+            font-size: 26px;
+            font-weight: 900;
+            margin: 0 0 5px 0;
+            letter-spacing: -0.5px;
+        }
+        .autor-badge {
+            display: inline-block;
+            background: #f3e9f9;
+            color: #4b1e6d;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            color: white;
+        }
+        .btn-principal { background-color: #4b1e6d; }
+        .btn-principal:hover { background-color: #3a1553; }
+        .btn-success { background-color: #2e7d32; }
+        .btn-success:hover { background-color: #1b5e20; }
+        .btn-danger { background-color: #d32f2f; }
+        .btn-danger:hover { background-color: #b71c1c; }
+        .btn-info { background-color: #0288d1; }
+        .btn-info:hover { background-color: #01579b; }
+
+        #formularioContainer {
+            display: none;
+            background: #f9f9fb;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .preview-container {
+            text-align: center;
+            margin-top: 25px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Encabezado rediseñado con título y tu firma -->
+        <!-- Título idéntico al de tus otras páginas -->
+        <h2 style="color: #0b1c48; font-family: Arial, sans-serif; font-size: 22px; font-weight: bold; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+            📱 Generador de cartelería - Consumo Inmediato
+        </h2>
+        <div style="font-family: Arial, sans-serif; font-size: 13px; color: #555; margin-bottom: 20px;">
+            Catálogo sincronizado desde GitHub en tiempo real. Creada por Ludmila - Sugerencias: orellanoludmila@hotmail.com
+        </div>
+    
+        
+        <button id="btnToggleForm" class="btn-success">➕ Agregar Producto</button>
+
+        <!-- (El resto de tu formulario y contenedor se mantiene igual) -->
+
+        <!-- FORMULARIO DESPLEGABLE -->
+        <div id="formularioContainer">
+            <h3 style="margin-top: 0; color: #2e7d32;">Nuevo Producto para Cartel</h3>
+            
+            <div class="form-group">
+                <label for="inputEan">EAN (Código de barras):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="inputEan" placeholder="Escaneá o ingresá el EAN..." style="flex: 1;">
+                    <label for="inputCamara" class="btn-info" style="display: flex; align-items: center; justify-content: center; padding: 0 15px; border-radius: 6px; cursor: pointer; margin: 0; font-size: 20px;" title="Escanear con cámara">
+                        📷
+                    </label>
+                    <input type="file" id="inputCamara" accept="image/*" capture="environment" style="display: none;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputDescripcion">Descripción del Producto:</label>
+                <input type="text" id="inputDescripcion" placeholder="Se completará solo o escribila manualmente">
+            </div>
+
+            <div class="form-group">
+                <label for="tipoCartel">Tipo de Cartel / Promoción:</label>
+                <select id="tipoCartel">
+                    <option value="cupon">Descuento por Cupón (Monto directo)</option>
+                    <option value="2x1">Promoción 2x1</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputPrecioAnterior" id="labelPrecio">Precio Regular / Anterior ($):</label>
+                <input type="number" id="inputPrecioAnterior" placeholder="Ej: 3900">
+            </div>
+
+            <div class="form-group" id="grupoDescuento">
+                <label for="inputDescuento">Valor del Descuento / Cupón ($):</label>
+                <input type="number" id="inputDescuento" placeholder="Ej: 1000">
+            </div>
+
+            <button id="btnGuardar" class="btn-success">💾 Guardar y Agregar a la Lista</button>
+            <button id="btnCancelar" class="btn-danger" style="margin-top: 5px;">❌ Cancelar</button>
+        </div>
+
+        <!-- LISTA DE PRODUCTOS ACUMULADOS -->
+        <div class="form-group" style="background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid #ddd; margin-top: 20px;">
+            <h3 style="margin-top:0;">Productos en la lista de impresión (<span id="contadorProductos">0</span>):</h3>
+            <ul id="listaProductosUI" style="padding-left: 0; list-style: none; margin: 5px 0;">
+                <li style="color: #666;">No hay productos agregados todavía.</li>
+            </ul>
+            <button id="btnLimpiarLista" class="btn-danger" style="padding: 8px; margin-top: 10px;">🗑️ Limpiar Lista</button>
+        </div>
+
+        <!-- VISTA PREVIA Y BOTONES SEPARADOS DE IMPRESIÓN / PDF -->
+        <div class="preview-container">
+            <h3>Vista Previa de los Carteles:</h3>
+            <div id="hojasImpresionContainer"></div>
+            
+            <div id="botonesAccion" style="display: none; margin-top: 20px;">
+                <button id="btnImprimirPC" class="btn-principal">🖨️ Imprimir PC</button>
+                <button id="btnDescargarPDF" class="btn-danger" style="background-color: #e50012;">📥 Descargar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Librería opcional ligera para lectura de códigos de barras desde foto de cámara si se desea -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <!-- Scripts de lógica -->
+    <script src="consumo.js"></script>
+    <!-- Librería jsPDF para generar y descargar PDFs reales -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
