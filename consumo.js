@@ -83,37 +83,58 @@ document.getElementById('inputEan').addEventListener('input', (e) => {
     }
 });
 
-// Soporte para captura de código con la cámara del celular
-document.getElementById('inputCamara').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+let html5QrcodeScanner = null;
+let escanerActivo = false;
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+function alternarCamaraConsumo() {
+    const readerDiv = document.getElementById("reader");
+    if (escanerActivo) {
+        detenerCamaraConsumo();
+        return;
+    }
+
+    readerDiv.style.display = "block";
+    html5QrcodeScanner = new Html5Qrcode("reader");
+
+    html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        (decodedText) => {
+            // Éxito al escanear
+            const eanLimpio = decodedText.trim();
+            document.getElementById('inputEan').value = eanLimpio;
             
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-            if (code) {
-                document.getElementById('inputEan').value = code.data;
-                const encontrado = catalogoProductos.find(p => p.ean === code.data);
-                if (encontrado) {
-                    document.getElementById('inputDescripcion').value = encontrado.descripcion.toUpperCase();
-                }
-            } else {
-                alert("No se pudo detectar el código de barras en la foto. Intentá ingresarlo manualmente.");
+            // Buscar automáticamente en el catálogo cargado
+            const encontrado = catalogoProductos.find(p => p.ean === eanLimpio);
+            if (encontrado) {
+                document.getElementById('inputDescripcion').value = encontrado.descripcion.toUpperCase();
             }
-        };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-});
+            
+            detenerCamaraConsumo();
+        },
+        (errorMessage) => {
+            // Ignorar errores de frame mientras busca el código
+        }
+    ).catch(err => {
+        alert("No se pudo iniciar la cámara: " + err);
+        readerDiv.style.display = "none";
+        escanerActivo = false;
+    });
+
+    escanerActivo = true;
+}
+
+function detenerCamaraConsumo() {
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+            document.getElementById("reader").style.display = "none";
+            escanerActivo = false;
+            html5QrcodeScanner = null;
+        }).catch(err => {
+            console.error("Error al detener la cámara", err);
+        });
+    }
+}
 
 // Manejar cambios en el selector de tipo de cartel
 document.getElementById('tipoCartel').addEventListener('change', (e) => {
