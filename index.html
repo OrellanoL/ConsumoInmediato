@@ -129,18 +129,20 @@
             <h3 style="margin-top: 0; color: #2e7d32;">Nuevo Producto para Cartel</h3>
             
             <div class="form-group">
-                <label for="inputEan">EAN (Código de barras):</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="inputEan" placeholder="Escaneá o ingresá el EAN..." style="flex: 1;">
-                    <label for="inputCamara" class="btn-info" style="display: flex; align-items: center; justify-content: center; padding: 0 15px; border-radius: 6px; cursor: pointer; margin: 0; font-size: 20px;" title="Escanear con cámara">
-                        📷
-                    </label>
-                    <input type="file" id="inputCamara" accept="image/*" capture="environment" style="display: none;">
-                </div>
-            </div>
-
+    
+    
             <div class="form-group">
-                <label for="inputDescripcion">Descripción del Producto:</label>
+       <div class="form-group">
+    <label for="inputEan">EAN (Código de barras):</label>
+    <div style="display: flex; gap: 10px; align-items: center; width: 100%;">
+        <input type="text" id="inputEan" placeholder="Escaneá o ingresá el EAN..." style="flex: 1; min-width: 0;">
+        <button type="button" onclick="alternarCamaraConsumo()" style="flex-shrink: 0; width: 50px; height: 42px; border-radius: 6px; cursor: pointer; border: none; background: #0284c7; color: white; font-size: 18px; display: flex; align-items: center; justify-content: center;" title="Escanear con cámara">
+            📷
+        </button>
+    </div>
+    <!-- Contenedor donde se mostrará el visor de la cámara -->
+    <div id="reader" style="width: 100%; max-width: 450px; margin: 10px auto; display: none;"></div>
+</div>         <label for="inputDescripcion">Descripción del Producto:</label>
                 <input type="text" id="inputDescripcion" placeholder="Se completará solo o escribila manualmente">
             </div>
 
@@ -188,7 +190,7 @@
     </div>
 
     <!-- Librería opcional ligera para lectura de códigos de barras desde foto de cámara si se desea -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- Scripts de lógica -->
     <script src="consumo.js"></script>
     <!-- Librería jsPDF para generar y descargar PDFs reales -->
