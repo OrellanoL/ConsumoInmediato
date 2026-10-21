@@ -231,9 +231,12 @@ document.getElementById('btnGuardar').addEventListener('click', async () => {
     guardarEnMemoria();
     await actualizarListaYVisualizacion();
 
-    formContainer.style.display = 'none';
-    document.getElementById('btnToggleForm').style.display = 'block';
-    limpiarFormulario();
+    // ✔️ NUEVO COMPORTAMIENTO: Mantiene el formulario abierto y limpia solo los campos
+    document.getElementById('inputEan').value = '';
+    document.getElementById('inputDescripcion').value = '';
+    document.getElementById('inputPrecioAnterior').value = '';
+    document.getElementById('inputDescuento').value = '';
+    document.getElementById('inputEan').focus(); // Deja el cursor listo para escanear el siguiente producto
 });
 
 async function actualizarListaYVisualizacion() {
